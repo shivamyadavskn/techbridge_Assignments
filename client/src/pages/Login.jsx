@@ -1,6 +1,6 @@
 
 import { useState, useContext, useCallback } from "react"
-import { useNavigate } from "react-router-dom"
+import { Link } from "react-router-dom"
 import { AuthContext } from "../contexts/AuthContext"
 import authService from "../services/authService"
 
@@ -10,7 +10,6 @@ const Login = () => {
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
   const { login } = useContext(AuthContext)
-  const navigate = useNavigate()
 
   const handleSubmit = useCallback(
     async (e) => {
@@ -21,14 +20,14 @@ const Login = () => {
       try {
         const { token } = await authService.login(username, password)
         login(token)
-        navigate("/dashboard")
+        // Navigation will be handled by PublicRoute component
       } catch (err) {
         setError("Invalid credentials. Please try again.")
       } finally {
         setLoading(false)
       }
     },
-    [username, password, login, navigate],
+    [username, password, login],
   )
 
   return (
@@ -46,6 +45,7 @@ const Login = () => {
             onChange={(e) => setUsername(e.target.value)}
             placeholder="Enter your username"
             required
+            disabled={loading}
           />
         </div>
 
@@ -58,6 +58,7 @@ const Login = () => {
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Enter your password"
             required
+            disabled={loading}
           />
         </div>
 
@@ -70,9 +71,9 @@ const Login = () => {
 
       <p style={{ textAlign: "center", marginTop: "1.5rem", color: "#6b7280" }}>
         Don't have an account?{" "}
-        <a href="/register" style={{ color: "#667eea", textDecoration: "none", fontWeight: "500" }}>
+        <Link to="/register" style={{ color: "#667eea", textDecoration: "none", fontWeight: "500" }}>
           Sign up here
-        </a>
+        </Link>
       </p>
     </div>
   )

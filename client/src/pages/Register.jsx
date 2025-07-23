@@ -1,7 +1,5 @@
-
-import { useState, useCallback, useContext, useEffect } from "react"
+import { useState, useCallback } from "react"
 import { useNavigate, Link } from "react-router-dom"
-import { AuthContext } from "../contexts/AuthContext"
 import authService from "../services/authService"
 
 const Register = () => {
@@ -10,20 +8,14 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState("")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
-  const { user } = useContext(AuthContext)
+  const [success, setSuccess] = useState(false)
   const navigate = useNavigate()
-
-  // Redirect if already logged in
-  useEffect(() => {
-    if (user) {
-      navigate("/dashboard", { replace: true })
-    }
-  }, [user, navigate])
 
   const handleSubmit = useCallback(
     async (e) => {
       e.preventDefault()
       setError("")
+      setSuccess(false)
 
       if (password !== confirmPassword) {
         setError("Passwords do not match")
@@ -39,7 +31,10 @@ const Register = () => {
 
       try {
         await authService.register(username, password)
-        navigate("/login", { replace: true })
+        setSuccess(true)
+        setTimeout(() => {
+          navigate("/login", { replace: true })
+        }, 2000)
       } catch (err) {
         setError("Username already exists or registration failed")
       } finally {
@@ -49,9 +44,15 @@ const Register = () => {
     [username, password, confirmPassword, navigate],
   )
 
-  // Don't render if user is already logged in
-  if (user) {
-    return null
+  if (success) {
+    return (
+      <div className="form-container">
+        <div className="alert alert-success">
+          <h3>🎉 Account Created Successfully!</h3>
+          <p>Redirecting to login page...</p>
+        </div>
+      </div>
+    )
   }
 
   return (

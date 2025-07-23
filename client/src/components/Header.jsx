@@ -1,5 +1,6 @@
+
 import { useContext } from "react"
-import { Link, useLocation } from "react-router-dom"
+import { Link, useLocation, useNavigate } from "react-router-dom"
 import { AuthContext } from "../contexts/AuthContext"
 import { ThemeContext } from "../contexts/ThemeContext"
 
@@ -7,6 +8,7 @@ const Header = () => {
   const { user, logout, loading } = useContext(AuthContext)
   const { theme, toggleTheme } = useContext(ThemeContext)
   const location = useLocation()
+  const navigate = useNavigate()
 
   // Don't show header on login/register pages
   if (location.pathname === "/login" || location.pathname === "/register") {
@@ -25,6 +27,11 @@ const Header = () => {
     )
   }
 
+  const handleLogout = () => {
+    logout()
+    navigate("/login", { replace: true })
+  }
+
   return (
     <header>
       <div className="header-content">
@@ -32,9 +39,13 @@ const Header = () => {
         <nav className="header-nav">
           {user ? (
             <>
-              <Link to="/dashboard">📊 Dashboard</Link>
-              <Link to="/transactions">💳 Transactions</Link>
-              <button onClick={logout} className="btn-secondary btn-small">
+              <Link to="/dashboard" className={location.pathname === "/dashboard" ? "active" : ""}>
+                📊 Dashboard
+              </Link>
+              <Link to="/transactions" className={location.pathname === "/transactions" ? "active" : ""}>
+                💳 Transactions
+              </Link>
+              <button onClick={handleLogout} className="btn-secondary btn-small">
                 🚪 Logout
               </button>
             </>
